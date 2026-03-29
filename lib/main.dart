@@ -1,4 +1,5 @@
 ﻿import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,7 +8,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -185,22 +187,23 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
 
   Future<void> _startLoginFlow() async {
     if (_webViewController != null) {
-      await _webViewController!.loadUrl(
-        urlRequest: URLRequest(url: _loginUri),
-      );
+      await _webViewController!.loadUrl(urlRequest: URLRequest(url: _loginUri));
     }
   }
 
   Future<void> _openGitHub() async {
-    await launchUrlString(
-      _githubUrl,
-      mode: LaunchMode.externalApplication,
-    );
+    await launchUrlString(_githubUrl, mode: LaunchMode.externalApplication);
   }
 
   Future<void> _exitApp() async {
-    if (_autoExitOnSuccess) {
-      await Future.delayed(const Duration(milliseconds: 300));
+    if (!_autoExitOnSuccess) {
+      return;
+    }
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      exit(0);
+    } else {
       SystemNavigator.pop();
     }
   }
@@ -242,7 +245,8 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
     final usernameJson = jsonEncode(_usernameController.text);
     final passwordJson = jsonEncode(_passwordController.text);
     final ispValueJson = jsonEncode(_selectedIsp.value);
-    final js = '''(function() {
+    final js =
+        '''(function() {
   const userEl = document.getElementsByName('DDDDD')[0];
   const passEl = document.getElementsByName('upass')[0];
   const ispEl = document.getElementsByName('ISP_select')[0];
@@ -321,8 +325,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: InAppWebView(
-                          initialUrlRequest:
-                              URLRequest(url: _loginUri),
+                          initialUrlRequest: URLRequest(url: _loginUri),
                           initialSettings: InAppWebViewSettings(
                             javaScriptEnabled: true,
                             cacheEnabled: true,
@@ -369,10 +372,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(
-                            '请输入校园网账号',
-                            style: theme.textTheme.titleLarge,
-                          ),
+                          Text('请输入校园网账号', style: theme.textTheme.titleLarge),
                           const SizedBox(height: 16),
                           TextField(
                             controller: _usernameController,
