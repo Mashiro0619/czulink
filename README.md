@@ -1,17 +1,9 @@
-# czulink
+# CZULink
 
-A new Flutter project.
+**CZULink** 是一款专为常州工学院师生制作的校园网自动登录工具。基于 Flutter 开发，采用 Material Design 3 设计规范。
 
-## Getting Started
+## 下载安装
+前往 [Releases](https://github.com/Mashiro0619/czulink/releases) 页面。
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 📄 开源协议
+[MIT License](LICENSE)
