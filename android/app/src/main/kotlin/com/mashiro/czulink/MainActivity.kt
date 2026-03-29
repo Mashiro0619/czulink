@@ -1,4 +1,4 @@
-package com.example.czulink
+package com.mashiro.czulink
 
 import io.flutter.embedding.android.FlutterActivity
 
