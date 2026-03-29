@@ -292,7 +292,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
         title: const Text('校园网自动登录'),
         actions: [
           IconButton(
-            icon: const Icon(MdiIcons.github),
+            icon: Icon(MdiIcons.github),
             onPressed: _openGitHub,
             tooltip: 'GitHub 仓库',
           ),
