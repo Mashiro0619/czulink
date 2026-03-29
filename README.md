@@ -9,4 +9,4 @@
 前往 [Releases](https://github.com/Mashiro0619/czulink/releases) 页面。
 
 ## 开源协议
-[MIT License](LICENSE)
+[GNU 通用公共许可证 v3.0](LICENSE)
