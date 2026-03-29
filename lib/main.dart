@@ -224,10 +224,12 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
     }
     return 'ALREADY_ON';
   }
-  if (userEl && passEl && ispEl) {
+  if (userEl && passEl) {
     userEl.value = $usernameJson;
     passEl.value = $passwordJson;
-    ispEl.value = $ispValueJson;
+    if (ispEl) {
+      ispEl.value = $ispValueJson;
+    }
     if(typeof window.ee === 'function') {
       window.ee(1);
       if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
