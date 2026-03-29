@@ -30,13 +30,13 @@ extension IspOptionExtension on IspOption {
   String get value {
     switch (this) {
       case IspOption.campus:
-        return '1';
+        return '';
       case IspOption.cmcc:
-        return '2';
+        return '@cmcc';
       case IspOption.cucc:
-        return '3';
+        return '@unicom';
       case IspOption.ctcc:
-        return '4';
+        return '@telecom';
     }
   }
 }
