@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -77,8 +78,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
   bool _autoExitOnSuccess = false;
   InAppWebViewController? _webViewController;
   final WebUri _loginUri = WebUri('http://172.19.0.1/');
-  final WebUri _githubUri = WebUri('https://github.com/Mashiro0619/czulink');
-  WebUri? _pendingUri;
+  final String _githubUrl = 'https://github.com/Mashiro0619/czulink';
 
   @override
   void initState() {
@@ -191,16 +191,10 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
   }
 
   Future<void> _openGitHub() async {
-    _pendingUri = _githubUri;
-    setState(() {
-      _showWebView = true;
-      _isLoading = false;
-    });
-    if (_webViewController != null) {
-      await _webViewController!.loadUrl(
-        urlRequest: URLRequest(url: _githubUri),
-      );
-    }
+    await launchUrlString(
+      _githubUrl,
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   Future<void> _exitApp() async {
@@ -228,6 +222,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
         break;
       case 'SUBMITTED':
         _showMessage('已提交登录请求。');
+        _exitApp();
         break;
       case 'NOT_READY':
         _showMessage('页面加载完成，但尚未找到登录表单。');
@@ -296,7 +291,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
         title: const Text('校园网自动登录'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.open_in_new),
+            icon: const Icon(Icons.github),
             onPressed: _openGitHub,
             tooltip: 'GitHub 仓库',
           ),
@@ -343,12 +338,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
                                 return null;
                               },
                             );
-                            if (_pendingUri != null) {
-                              controller.loadUrl(
-                                urlRequest: URLRequest(url: _pendingUri!),
-                              );
-                              _pendingUri = null;
-                            } else if (_hasSavedCredentials) {
+                            if (_hasSavedCredentials) {
                               _startLoginFlow();
                             }
                           },
