@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -291,7 +292,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
         title: const Text('校园网自动登录'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.github),
+            icon: const Icon(MdiIcons.github),
             onPressed: _openGitHub,
             tooltip: 'GitHub 仓库',
           ),
