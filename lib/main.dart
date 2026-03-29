@@ -1,6 +1,7 @@
 ﻿import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -73,8 +74,11 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
   bool _isLoading = false;
   bool _hasSavedCredentials = false;
   bool _showWebView = false;
+  bool _autoExitOnSuccess = false;
   InAppWebViewController? _webViewController;
   final WebUri _loginUri = WebUri('http://172.19.0.1/');
+  final WebUri _githubUri = WebUri('https://github.com/Mashiro0619/czulink');
+  WebUri? _pendingUri;
 
   @override
   void initState() {
@@ -94,10 +98,12 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
     final username = prefs.getString('username');
     final password = prefs.getString('password');
     final ispName = prefs.getString('ispOption');
+    final autoExit = prefs.getBool('autoExitOnSuccess') ?? false;
     if (username != null && password != null) {
       setState(() {
         _usernameController.text = username;
         _passwordController.text = password;
+        _autoExitOnSuccess = autoExit;
         _selectedIsp = IspOption.values.firstWhere(
           (option) => option.name == ispName,
           orElse: () => IspOption.campus,
@@ -105,6 +111,10 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
         _hasSavedCredentials = true;
         _showWebView = true;
         _isLoading = true;
+      });
+    } else {
+      setState(() {
+        _autoExitOnSuccess = autoExit;
       });
     }
   }
@@ -121,6 +131,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
     await prefs.setString('username', username);
     await prefs.setString('password', password);
     await prefs.setString('ispOption', _selectedIsp.name);
+    await prefs.setBool('autoExitOnSuccess', _autoExitOnSuccess);
 
     setState(() {
       _hasSavedCredentials = true;
@@ -158,11 +169,13 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
     await prefs.remove('username');
     await prefs.remove('password');
     await prefs.remove('ispOption');
+    await prefs.remove('autoExitOnSuccess');
 
     setState(() {
       _usernameController.clear();
       _passwordController.clear();
       _selectedIsp = IspOption.campus;
+      _autoExitOnSuccess = false;
       _hasSavedCredentials = false;
       _showWebView = false;
       _isLoading = false;
@@ -174,6 +187,26 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
       await _webViewController!.loadUrl(
         urlRequest: URLRequest(url: _loginUri),
       );
+    }
+  }
+
+  Future<void> _openGitHub() async {
+    _pendingUri = _githubUri;
+    setState(() {
+      _showWebView = true;
+      _isLoading = false;
+    });
+    if (_webViewController != null) {
+      await _webViewController!.loadUrl(
+        urlRequest: URLRequest(url: _githubUri),
+      );
+    }
+  }
+
+  Future<void> _exitApp() async {
+    if (_autoExitOnSuccess) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      SystemNavigator.pop();
     }
   }
 
@@ -191,6 +224,7 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
           _isLoading = false;
         });
         _showMessage('已检测到已登录状态。');
+        _exitApp();
         break;
       case 'SUBMITTED':
         _showMessage('已提交登录请求。');
@@ -262,6 +296,11 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
         title: const Text('校园网自动登录'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.open_in_new),
+            onPressed: _openGitHub,
+            tooltip: 'GitHub 仓库',
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: _resetCredentials,
             tooltip: '重置账号',
@@ -304,7 +343,12 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
                                 return null;
                               },
                             );
-                            if (_hasSavedCredentials) {
+                            if (_pendingUri != null) {
+                              controller.loadUrl(
+                                urlRequest: URLRequest(url: _pendingUri!),
+                              );
+                              _pendingUri = null;
+                            } else if (_hasSavedCredentials) {
                               _startLoginFlow();
                             }
                           },
@@ -381,6 +425,17 @@ class _CampusLoginPageState extends State<CampusLoginPage> {
                             onSelectionChanged: (newSelection) {
                               setState(() {
                                 _selectedIsp = newSelection.first;
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('登录成功后自动退出软件'),
+                            value: _autoExitOnSuccess,
+                            onChanged: (value) {
+                              setState(() {
+                                _autoExitOnSuccess = value;
                               });
                             },
                           ),
